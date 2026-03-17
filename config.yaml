@@ -48,8 +48,6 @@ uploader:
   timeout_seconds: 10
   # Cantidad máxima de eventos a enviar en un lote
   batch_size: 20
-  # Segundos de espera entre intentos al detectar falta de conectividad
-  retry_interval_seconds: 60
 
 # ── Dispositivo ───────────────────────────────────────────────────────────────
 device:

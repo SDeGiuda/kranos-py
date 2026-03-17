@@ -83,7 +83,7 @@ def test_upload_event_connection_error_returns_false(uploader):
 # ── sync_pending ──────────────────────────────────────────────────────────────
 
 def test_sync_pending_marks_successful_events(uploader):
-    """sync_pending debe marcar como sincronizados sólo los eventos enviados."""
+    """sync_pending debe marcar como sincronizados los eventos del lote enviado."""
     mock_storage = MagicMock()
     mock_storage.get_pending_events.return_value = [
         {"id": 10, "device_id": "rpi-001"},
@@ -111,8 +111,8 @@ def test_sync_pending_no_events_returns_zero(uploader):
     mock_storage.mark_as_synced.assert_not_called()
 
 
-def test_sync_pending_partial_failure(uploader):
-    """Si un evento falla, sólo los exitosos se marcan como sincronizados."""
+def test_sync_pending_batch_failure_marks_no_events(uploader):
+    """Si el lote falla, ningún evento debe marcarse como sincronizado."""
     import requests as req_lib
 
     mock_storage = MagicMock()
@@ -121,18 +121,11 @@ def test_sync_pending_partial_failure(uploader):
         {"id": 21},
     ]
 
-    ok_response = MagicMock()
-    ok_response.status_code = 200
-    ok_response.raise_for_status.return_value = None
-
     err_response = MagicMock()
     err_response.raise_for_status.side_effect = req_lib.exceptions.HTTPError("500")
 
-    with patch(
-        "src.uploader.requests.post",
-        side_effect=[ok_response, err_response],
-    ):
+    with patch("src.uploader.requests.post", return_value=err_response):
         synced = uploader.sync_pending(mock_storage)
 
-    assert synced == 1
-    mock_storage.mark_as_synced.assert_called_once_with([20])
+    assert synced == 0
+    mock_storage.mark_as_synced.assert_not_called()

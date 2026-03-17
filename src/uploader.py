@@ -9,10 +9,9 @@ Los eventos se envían en lotes (batch) para minimizar el número de
 peticiones HTTP.
 """
 
-import json
 import logging
 import socket
-from typing import List, Optional
+from typing import List
 
 try:
     import requests
@@ -45,8 +44,8 @@ def is_connected(
         ``True`` si hay conectividad, ``False`` en caso contrario.
     """
     try:
-        socket.setdefaulttimeout(timeout)
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.settimeout(timeout)
             sock.connect((host, port))
         return True
     except OSError:
@@ -163,12 +162,7 @@ class EventUploader:
 
         logger.info("Sincronizando %d eventos pendientes…", len(pending))
 
-        synced_ids: List[int] = []
-        for event in pending:
-            if self.upload_event(event):
-                event_id = event.get("id")
-                if event_id is not None:
-                    synced_ids.append(event_id)
+        synced_ids: List[int] = self.upload_batch(pending)
 
         if synced_ids:
             storage.mark_as_synced(synced_ids)

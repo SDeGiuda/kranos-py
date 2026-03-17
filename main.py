@@ -150,7 +150,7 @@ def run_cycle(
 
     # 7. Limpieza de imágenes antiguas
     max_images = capture_cfg.get("max_images", 200)
-    cleanup_old_images(capture_cfg.get("image_dir", "data/images"), max_images)
+    cleanup_old_images(str(camera.image_dir), max_images)
 
 
 def main(config_path: str) -> None:

@@ -1,9 +1,5 @@
 """Pruebas unitarias para src/storage.py."""
 
-import json
-import os
-import tempfile
-
 import pytest
 
 from src.storage import LocalStorage
