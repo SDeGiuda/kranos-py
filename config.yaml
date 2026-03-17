@@ -1,0 +1,57 @@
+# Kranos-Py – Configuración del módulo de monitoreo
+
+# ── Captura ───────────────────────────────────────────────────────────────────
+capture:
+  # Intervalo entre capturas en segundos
+  interval_seconds: 30
+  # Resolución de la cámara [ancho, alto]
+  resolution: [1280, 720]
+  # Directorio donde se guardan las imágenes capturadas
+  image_dir: data/images
+  # Cantidad máxima de imágenes a retener localmente (las más antiguas se eliminan)
+  max_images: 200
+
+# ── Detección ─────────────────────────────────────────────────────────────────
+detector:
+  # Ruta al modelo YOLOv8 entrenado para detección de cascos
+  model_path: models/helmet_detector.pt
+  # Umbral de confianza mínima para aceptar una detección
+  confidence_threshold: 0.50
+  # ID de clase que corresponde a "persona sin casco"
+  no_helmet_class_id: 1
+  # ID de clase que corresponde a "persona con casco"
+  helmet_class_id: 0
+  # Tamaño de inferencia (múltiplo de 32, ej. 640)
+  imgsz: 640
+
+# ── Sensor de temperatura ─────────────────────────────────────────────────────
+temperature:
+  # Tipo de sensor: DHT11 | DHT22 | MOCK
+  sensor_type: DHT22
+  # Número de pin GPIO al que está conectado el sensor (BCM)
+  gpio_pin: 4
+  # Valor de temperatura por defecto cuando el sensor no está disponible
+  default_celsius: 25.0
+
+# ── Almacenamiento local ──────────────────────────────────────────────────────
+storage:
+  # Ruta al archivo de base de datos SQLite
+  db_path: data/events.db
+
+# ── Carga a la nube ───────────────────────────────────────────────────────────
+uploader:
+  # URL base del backend cloud (sin barra final)
+  backend_url: http://localhost:8000
+  # Endpoint donde se envían los eventos
+  events_endpoint: /api/events
+  # Timeout en segundos para cada petición HTTP
+  timeout_seconds: 10
+  # Cantidad máxima de eventos a enviar en un lote
+  batch_size: 20
+  # Segundos de espera entre intentos al detectar falta de conectividad
+  retry_interval_seconds: 60
+
+# ── Dispositivo ───────────────────────────────────────────────────────────────
+device:
+  # Identificador único del dispositivo
+  id: rpi-001
